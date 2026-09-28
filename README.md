@@ -202,4 +202,4 @@ If intervis is useful in your work, please cite it (and IntegronFinder and DIAMO
 A suggested form:
 
 > Nguyen, L. (2026). *intervis: an interactive integron array visualiser.* SCIE3220.
-> https://github.com/<your-username>/intervis
+> https://github.com/NqynX/intervis

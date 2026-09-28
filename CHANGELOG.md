@@ -42,4 +42,4 @@ R/Shiny GUI.
   `add_example.sh` (register your own genome) as helpers. `fetch_examples.sh` keeps a
   genome only if IntegronFinder finds a complete integron (integrase + attC array).
 
-[1.0.0]: https://github.com/your-username/intervis/releases/tag/v1.0.0
+[1.0.0]: https://github.com/NqynX/intervis/releases/tag/v1.0.0
