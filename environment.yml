@@ -1,0 +1,16 @@
+# Reproduce the runtime env intervis needs (IntegronFinder + DIAMOND + Python).
+#   micromamba create -f environment.yml     # or: conda env create -f environment.yml
+#   micromamba activate integronfinder
+#   pip install -e .                          # install the intervis CLI into the env
+#
+# The R Shiny GUI additionally needs R (>= 4.1) with the 'shiny' package. On an HPC
+# that is usually a module (e.g. `module load r`); locally, install.packages("shiny").
+name: integronfinder
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python >=3.9
+  - integron_finder >=2.0.2
+  - diamond >=2.1
+  - pip

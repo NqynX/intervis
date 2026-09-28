@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "intervis"
+version = "1.0.0"
+description = "Interactive integron array visualiser (IntegronFinder -> interactive HTML)"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [{ name = "Liam Nguyen" }]
+license = { text = "MIT" }
+dependencies = []            # Phase 0 is stdlib-only
+
+[project.scripts]
+intervis = "intervis.cli:main"
+
+[tool.setuptools]
+packages = ["intervis"]
+
+[tool.setuptools.package-data]
+intervis = ["templates/*.html"]

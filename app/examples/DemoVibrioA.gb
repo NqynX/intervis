@@ -1,0 +1,43 @@
+LOCUS       DemoVibrioA_chr  5320 bp    DNA     linear   BCT
+DEFINITION  DemoVibrioA demonstration integron array.
+ACCESSION   DemoVibrioA_chr
+VERSION     DemoVibrioA_chr
+FEATURES             Location/Qualifiers
+     source          1..5320
+                     /organism="demo"
+     CDS             401..1393
+                     /gene="intI1"
+                     /locus_tag="DemoVibrioA_chr_1"
+                     /product="integron integrase IntI1"
+     CDS             1394..1867
+                     /gene="dfrA1"
+                     /locus_tag="DemoVibrioA_chr_2"
+                     /product="dihydrofolate reductase"
+     CDS             complement(1928..2716)
+                     /gene="aadA2"
+                     /locus_tag="DemoVibrioA_chr_3"
+                     /product="aminoglycoside 3''-adenylyltransferase"
+     CDS             2777..3109
+                     /gene="qacEdelta1"
+                     /locus_tag="DemoVibrioA_chr_4"
+                     /product="quaternary ammonium compound efflux protein"
+     CDS             3170..3421
+                     /gene="relB"
+                     /locus_tag="DemoVibrioA_chr_5"
+                     /product="antitoxin RelB"
+     CDS             3482..3769
+                     /gene="relE"
+                     /locus_tag="DemoVibrioA_chr_6"
+                     /product="toxin RelE"
+     CDS             complement(3830..4216)
+                     /locus_tag="DemoVibrioA_chr_7"
+                     /product="hypothetical protein"
+     CDS             4277..4567
+                     /locus_tag="DemoVibrioA_chr_8"
+                     /product="hypothetical protein"
+     CDS             4628..5260
+                     /gene="catB3"
+                     /locus_tag="DemoVibrioA_chr_9"
+                     /product="chloramphenicol acetyltransferase"
+ORIGIN
+//

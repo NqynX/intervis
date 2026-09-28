@@ -1,0 +1,19 @@
+# demo	DemoVibrioA
+ID_integron	ID_replicon	element	pos_beg	pos_end	strand	evalue	type_elt	annotation	model	type
+DemoVibrioA_1	DemoVibrioA_chr	DemoVibrioA_chr_1	401	1393	1	NA	protein	intI1	intersection_tyr_intI	complete
+DemoVibrioA_1	DemoVibrioA_chr	DemoVibrioA_chr_2	1394	1867	1	NA	protein	protein	NA	complete
+DemoVibrioA_1	DemoVibrioA_chr	attC_001	1868	1927	1	1e-9	attC	attC	attc_4	complete
+DemoVibrioA_1	DemoVibrioA_chr	DemoVibrioA_chr_3	1928	2716	-1	NA	protein	protein	NA	complete
+DemoVibrioA_1	DemoVibrioA_chr	attC_002	2717	2776	1	1e-9	attC	attC	attc_4	complete
+DemoVibrioA_1	DemoVibrioA_chr	DemoVibrioA_chr_4	2777	3109	1	NA	protein	protein	NA	complete
+DemoVibrioA_1	DemoVibrioA_chr	attC_003	3110	3169	1	1e-9	attC	attC	attc_4	complete
+DemoVibrioA_1	DemoVibrioA_chr	DemoVibrioA_chr_5	3170	3421	1	NA	protein	protein	NA	complete
+DemoVibrioA_1	DemoVibrioA_chr	attC_004	3422	3481	1	1e-9	attC	attC	attc_4	complete
+DemoVibrioA_1	DemoVibrioA_chr	DemoVibrioA_chr_6	3482	3769	1	NA	protein	protein	NA	complete
+DemoVibrioA_1	DemoVibrioA_chr	attC_005	3770	3829	1	1e-9	attC	attC	attc_4	complete
+DemoVibrioA_1	DemoVibrioA_chr	DemoVibrioA_chr_7	3830	4216	-1	NA	protein	protein	NA	complete
+DemoVibrioA_1	DemoVibrioA_chr	attC_006	4217	4276	1	1e-9	attC	attC	attc_4	complete
+DemoVibrioA_1	DemoVibrioA_chr	DemoVibrioA_chr_8	4277	4567	1	NA	protein	protein	NA	complete
+DemoVibrioA_1	DemoVibrioA_chr	attC_007	4568	4627	1	1e-9	attC	attC	attc_4	complete
+DemoVibrioA_1	DemoVibrioA_chr	DemoVibrioA_chr_9	4628	5260	1	NA	protein	protein	NA	complete
+DemoVibrioA_1	DemoVibrioA_chr	attC_008	5261	5320	1	1e-9	attC	attC	attc_4	complete

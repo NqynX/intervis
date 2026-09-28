@@ -1,0 +1,1 @@
+v24 built 2026-09-28T08:12:10Z — single view now shows the genome identifier in a left gutter (name + N cassettes), matching the compare view, so the exported single-view figure carries its side label too. +/- strand markers moved beside the plot; left margin widened to match compare. Template-only (cartographer.html) -> NO R restart, unzip -o + press Run.

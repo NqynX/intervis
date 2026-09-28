@@ -1,0 +1,43 @@
+LOCUS       DemoVibrioB_chr  5971 bp    DNA     linear   BCT
+DEFINITION  DemoVibrioB demonstration integron array.
+ACCESSION   DemoVibrioB_chr
+VERSION     DemoVibrioB_chr
+FEATURES             Location/Qualifiers
+     source          1..5971
+                     /organism="demo"
+     CDS             401..1393
+                     /gene="intI1"
+                     /locus_tag="DemoVibrioB_chr_1"
+                     /product="integron integrase IntI1"
+     CDS             1394..1867
+                     /gene="dfrA1"
+                     /locus_tag="DemoVibrioB_chr_2"
+                     /product="dihydrofolate reductase"
+     CDS             complement(1928..2716)
+                     /gene="aadA2"
+                     /locus_tag="DemoVibrioB_chr_3"
+                     /product="aminoglycoside 3''-adenylyltransferase"
+     CDS             2777..3028
+                     /gene="relB"
+                     /locus_tag="DemoVibrioB_chr_4"
+                     /product="antitoxin RelB"
+     CDS             3089..3376
+                     /gene="relE"
+                     /locus_tag="DemoVibrioB_chr_5"
+                     /product="toxin RelE"
+     CDS             complement(3437..4039)
+                     /gene="abiEii"
+                     /locus_tag="DemoVibrioB_chr_6"
+                     /product="abortive infection protein AbiEii"
+     CDS             complement(4100..4486)
+                     /locus_tag="DemoVibrioB_chr_7"
+                     /product="hypothetical protein"
+     CDS             4547..5386
+                     /gene="sul1"
+                     /locus_tag="DemoVibrioB_chr_8"
+                     /product="dihydropteroate synthase Sul1"
+     CDS             5447..5911
+                     /locus_tag="DemoVibrioB_chr_9"
+                     /product="hypothetical protein"
+ORIGIN
+//

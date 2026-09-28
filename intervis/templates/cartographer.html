@@ -1,0 +1,608 @@
+<meta charset="utf-8">
+<title>intervis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --ground:#eef1f5; --surface:#ffffff; --surface-2:#f6f8fb;
+  --ink:#1a2230; --muted:#5b6b7c; --faint:#8a97a6; --border:#dbe2ea;
+  --accent:#5b3fa6; --accent-soft:#efeaf9;
+  --fwd:#2e6e8e; --rev:#c08422; --inti:#b23a48; --attc:#6a4c93; --bb:#41505f;
+  --fn-def:#2e6e8e; --fn-ta:#c08422; --fn-amr:#a23b72; --fn-other:#161b22; --fn-hyp:#9aa5b1;
+  --shadow:0 1px 2px rgba(20,30,45,.06),0 8px 24px rgba(20,30,45,.06);
+}
+:root:not([data-theme="light"]){
+  @media (prefers-color-scheme:dark){
+    --ground:#0f141b; --surface:#171e28; --surface-2:#1d2732;
+    --ink:#e7ecf2; --muted:#93a0ad; --faint:#66747f; --border:#2a3541;
+    --accent:#9b7ad8; --accent-soft:#241d3a;
+    --fwd:#4c93b8; --rev:#e0a63c; --inti:#e0687a; --attc:#9b7ad8; --bb:#7c8a99;
+    --fn-def:#4c93b8; --fn-ta:#e0a63c; --fn-amr:#cf7bb0; --fn-other:#e7ecf2; --fn-hyp:#8895a2;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0f141b; --surface:#171e28; --surface-2:#1d2732;
+  --ink:#e7ecf2; --muted:#93a0ad; --faint:#66747f; --border:#2a3541;
+  --accent:#9b7ad8; --accent-soft:#241d3a;
+  --fwd:#4c93b8; --rev:#e0a63c; --inti:#e0687a; --attc:#9b7ad8; --bb:#7c8a99;
+  --fn-def:#4c93b8; --fn-ta:#e0a63c; --fn-amr:#cf7bb0; --fn-other:#e7ecf2; --fn-hyp:#8895a2;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.wrap{max-width:1180px;margin:0 auto;padding-block:22px;padding-inline:18px}
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px 22px;margin-bottom:16px}
+.brand{display:flex;align-items:center;gap:11px}
+.glyph{width:34px;height:34px;flex:none}
+.title h1{font-size:21px;font-weight:700;margin:0;letter-spacing:-.01em}
+.title p{margin:2px 0 0;color:var(--muted);font-size:12.5px}
+.stats{display:flex;flex-wrap:wrap;gap:8px;margin-left:auto}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:9px;
+  padding:7px 12px;box-shadow:var(--shadow);min-width:70px}
+.stat .k{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint)}
+.stat .v{font-size:16px;font-weight:600;margin-top:1px}
+.stat .v small{font-size:11px;color:var(--muted);font-weight:400}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:11px 14px;box-shadow:var(--shadow);margin-bottom:14px}
+.grp{display:flex;align-items:center;gap:8px}
+.grp>.lab{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint)}
+.seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:2px}
+.seg button{font-family:inherit;font-size:12.5px;color:var(--muted);background:none;
+  border:none;padding:5px 11px;border-radius:7px;cursor:pointer;font-weight:500}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
+:root[data-theme="dark"] .seg button[aria-pressed="true"],
+:root:not([data-theme="light"]) .seg button[aria-pressed="true"]{color:#12161b}
+.btn{font-family:inherit;font-size:12.5px;color:var(--ink);background:var(--surface);
+  border:1px solid var(--border);padding:6px 11px;border-radius:8px;cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.tgl[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+#brush{width:30px;height:27px;padding:0;border:1px solid var(--border);border-radius:7px;
+  background:var(--surface);cursor:pointer;vertical-align:middle}
+#brush::-webkit-color-swatch-wrapper{padding:2px}
+#brush::-webkit-color-swatch{border:none;border-radius:4px}
+#viewport.paint{cursor:crosshair}
+.btn:focus-visible,.seg button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.spacer{flex:1 1 auto}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  box-shadow:var(--shadow);overflow:hidden}
+.ov{padding:12px 14px 6px;border-bottom:1px solid var(--border)}
+.ov .cap{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint);margin-bottom:6px}
+#overview{display:block;width:100%;height:46px;cursor:pointer;touch-action:none}
+#viewport{display:block;width:100%;height:300px;touch-action:none;cursor:grab}
+#viewport.drag{cursor:grabbing}
+.legend{display:flex;flex-wrap:wrap;gap:12px 18px;padding:10px 14px;border-top:1px solid var(--border);
+  font-size:12px;color:var(--muted);align-items:center}
+.lg{display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:10px;border-radius:2px;border:1px solid rgba(0,0,0,.15)}
+.hint{margin-left:auto;color:var(--faint);font-size:11.5px}
+.row{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;margin-top:14px}
+@media(max-width:720px){.row{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:14px 16px}
+.card h3{margin:0 0 9px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);font-weight:600}
+#info .empty{color:var(--muted);font-size:13px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:13px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;font-weight:500}
+.pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11.5px;font-weight:600;color:#fff}
+:root[data-theme="dark"] .pill,:root:not([data-theme="light"]) .pill{color:#12161b}
+.note{font-size:12.5px;color:var(--muted);line-height:1.55}
+.note b{color:var(--ink);font-weight:600}
+#tip{position:fixed;pointer-events:none;z-index:20;background:var(--ink);color:var(--ground);
+  font-size:12px;padding:7px 10px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.28);
+  opacity:0;transition:opacity .08s;max-width:250px;line-height:1.45}
+#tip .t{font-weight:600;margin-bottom:2px}
+#tip .c{font-family:"IBM Plex Mono",monospace;font-size:11px;opacity:.85}
+.foot{margin-top:16px;color:var(--faint);font-size:11.5px;line-height:1.5}
+.toggle{position:fixed;top:14px;right:14px;z-index:15}
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <div class="brand">
+      <svg class="glyph" viewBox="0 0 34 34" aria-hidden="true">
+        <rect x="1" y="1" width="32" height="32" rx="8" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.2"/>
+        <path d="M6 22 h5 l2-8 2 8 h3 l2-5 2 5 h4" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+        <circle cx="25" cy="12" r="2.4" fill="var(--attc)"/>
+      </svg>
+      <div class="title">
+        <h1 id="genomeTitle">Integron array</h1>
+        <p>Interactive map of an IntegronFinder cassette array</p>
+      </div>
+    </div>
+    <div class="stats" id="stats"></div>
+  </div>
+
+  <div class="bar">
+    <div class="grp">
+      <div class="seg" id="mode" role="group" aria-label="Colour mode">
+        <button data-mode="function" aria-pressed="true">Function</button>
+        <button data-mode="strand" aria-pressed="false">Strand</button>
+        <button data-mode="length" aria-pressed="false">Length</button>
+      </div>
+    </div>
+    <div class="grp"><span class="lab">Tracks</span>
+      <button class="btn tgl" id="t-lab" aria-pressed="false">Labels</button>
+      <button class="btn tgl" id="t-attc" aria-pressed="true">attC ✳</button>
+      <button class="btn tgl" id="t-len" aria-pressed="true">Length</button>
+    </div>
+    <div class="grp"><span class="lab">Colour tool</span>
+      <input type="color" id="brush" value="#e4572e" aria-label="Region colour" title="Region shade colour">
+      <button class="btn tgl" id="t-region" aria-pressed="false" title="Drag across the plot to shade a region">Region</button>
+      <button class="btn" id="reset-col" title="Clear all custom colours">Reset</button>
+    </div>
+    <div class="grp"><span class="lab">Zoom</span>
+      <button class="btn" id="zoomout" aria-label="Zoom out">–</button>
+      <button class="btn" id="zoomin" aria-label="Zoom in">+</button>
+      <button class="btn" id="fit">Fit</button>
+    </div>
+    <div class="spacer"></div>
+    <div class="grp"><span class="lab">Export</span>
+      <button class="btn" id="dl-svg">SVG</button>
+      <button class="btn" id="dl-png">PNG</button>
+      <button class="btn" id="dl-pdf">PDF</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="ov">
+      <div class="cap">Whole array</div>
+      <svg id="overview"></svg>
+    </div>
+    <svg id="viewport"></svg>
+    <div class="legend" id="legend"></div>
+  </div>
+
+  <div class="row">
+    <div class="card" id="info">
+      <h3>Feature</h3>
+      <div class="empty">Hover a gene or <em>attC</em> mark to inspect it. Scroll to zoom, drag to pan; keep zooming to read the DNA sequence.</div>
+    </div>
+    <div class="card">
+      <h3>About this view</h3>
+      <p class="note">Genes sit on a central backbone — <b>forward</b> strand above, <b>reverse</b> below — at their true coordinates, coloured by function. <em>attC</em> recombination sites are marked with an asterisk (✳) above the backbone. Zoom in to read the DNA bases. <b>Click any arrow</b> to pick its colour (alt-click clears it); toggle <b>Region</b> and drag to shade a span in the swatch colour; <b>Reset</b> clears them. Toggle <b>Labels</b> for gene names and export as SVG/PNG/PDF.</p>
+    </div>
+  </div>
+
+  <p class="foot">intervis &middot; interactive integron array viewer.</p>
+</div>
+
+<button class="btn toggle" id="theme" aria-label="Toggle theme">◐</button>
+<div id="tip" role="status"></div>
+<input type="color" id="cpick" aria-label="Arrow colour"
+  style="position:fixed;width:26px;height:22px;opacity:0;z-index:30;padding:0;border:0;pointer-events:none">
+<div id="chint" style="position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:15;
+  background:var(--ink);color:var(--ground);font-size:11.5px;padding:5px 10px;border-radius:7px;
+  opacity:0;transition:opacity .12s;pointer-events:none">Click any arrow to pick its colour</div>
+
+<script>
+"use strict";
+let FEATURES, FN, GENOME_NAME, SEQ, SEQ0;
+try { FEATURES = __DATA__; FN = __FN__; GENOME_NAME = __NAME__; SEQ = __SEQ__; SEQ0 = __SEQ0__; }  // injected by the app
+catch (e) { FEATURES = null; }                                    // opened as a bare template
+if (!FEATURES) {
+  document.body.innerHTML = '<div style="max-width:560px;margin:12vh auto;padding:0 24px;font-family:system-ui,sans-serif;color:#8a94a6;line-height:1.55"><h2 style="color:#c9d3e0;font-weight:600;margin:0 0 8px">intervis viewer template</h2><p>This page is drawn by the intervis app, which injects the parsed <code>.integrons</code> data when it runs. Open it inside the app (upload a file) to see the array — the template on its own has no data to draw.</p></div>';
+} else {
+const SLUG = String(GENOME_NAME||"integron").replace(/[^A-Za-z0-9._-]+/g,"_");
+document.getElementById("genomeTitle").textContent = GENOME_NAME;
+const FNCAT=["hypothetical","other","ta","defence","amr"];
+const fnLabel={defence:"Anti-phage defence",ta:"Toxin–antitoxin",amr:"AMR",
+  other:"Pfam domain",hypothetical:"Hypothetical"};
+const K_INTI=0,K_CDS=1,K_ATTC=2;
+
+let idxC=0, idxA=0;
+const feats = FEATURES.map(f=>{
+  const [s,e,d,k]=f;
+  let name,fncat=null,fnlabel=null,gene="";
+  if(k===K_INTI){ name="intI integrase"; gene="intI"; }
+  else if(k===K_ATTC) name="attC_"+String(++idxA).padStart(3,"0");
+  else { const g=FN[idxC++]||[0,"no annotation",""]; fncat=FNCAT[g[0]]; fnlabel=g[1]; gene=g[2]||"";
+         name="Cassette CDS "+idxC; }
+  return {s:Math.min(s,e),e:Math.max(s,e),dir:d,kind:k,name,len:Math.abs(e-s),fncat,fnlabel,gene};
+});
+const A0=Math.min(...feats.map(f=>f.s)), A1=Math.max(...feats.map(f=>f.e));
+const SPAN=A1-A0;
+const cds=feats.filter(f=>f.kind===K_CDS), attc=feats.filter(f=>f.kind===K_ATTC);
+const genes=feats.filter(f=>f.kind!==K_ATTC);
+const maxLen=Math.max(...cds.map(f=>f.len));
+
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function palette(){return{fwd:css("--fwd"),rev:css("--rev"),inti:css("--inti"),attc:css("--attc"),bb:css("--bb"),
+  def:css("--fn-def"),ta:css("--fn-ta"),amr:css("--fn-amr"),other:css("--fn-other"),hyp:css("--fn-hyp"),
+  ink:css("--ink"),muted:css("--muted"),faint:css("--faint"),border:css("--border"),surface:css("--surface")};}
+function fnColor(cat,P){return {defence:P.def,ta:P.ta,amr:P.amr,other:P.other,hypothetical:P.hyp}[cat]||P.hyp;}
+const HAS_SEQ = typeof SEQ==="string" && SEQ.length>0;
+const BASECOL = {A:"#3fa34d",C:"#3b6ea5",G:"#d19a2f",T:"#c0504d",N:"#9aa5b1"};
+
+let mode="function", showAttc=true, showLen=true, showLab=false;
+let brush="#e4572e", regionMode=false, regions=[], preview=null;   // user colour tool
+let view={a:A0,b:A1};
+const vp=document.getElementById("viewport"), ov=document.getElementById("overview");
+const NS="http://www.w3.org/2000/svg";
+const PAD={l:150,r:18};   // left gutter holds the genome identifier (matches the compare view)
+// vertical layout: sequence strip, attC asterisks, forward genes, backbone,
+// reverse genes, then the optional length track.
+const LY={seqY:22, attcY:46, fC:72, bbY:92, rC:112, gh:15, gap:4, lenY:152, lenH:92};
+
+function el(tag,attrs,parent){const n=document.createElementNS(NS,tag);
+  for(const k in attrs)n.setAttribute(k,attrs[k]); if(parent)parent.appendChild(n); return n;}
+
+function colorFor(f,P){
+  if(f && f.override)return f.override;         // user-picked colour for this arrow
+  if(f.kind===K_INTI)return P.inti;
+  if(mode==="strand")return f.dir<0?P.rev:P.fwd;
+  if(mode==="length"){const t=Math.min(1,f.len/1200);return mixHex(P.faint,P.fwd,t);}
+  return fnColor(f.fncat,P);
+}
+function mixHex(a,b,t){const pa=hx(a),pb=hx(b);
+  const c=pa.map((v,i)=>Math.round(v+(pb[i]-v)*t));
+  return "#"+c.map(v=>v.toString(16).padStart(2,"0")).join("");}
+function hx(h){h=h.replace("#","");if(h.length===3)h=h.split("").map(c=>c+c).join("");
+  return [0,2,4].map(i=>parseInt(h.slice(i,i+2),16));}
+
+function botY(){return showLen ? LY.lenY+LY.lenH : LY.rC+LY.gh+12;}
+function contentH(){return botY()+30;}
+
+function drawArrow(f,x,P,into){
+  const fwd=f.dir>=0, cy=fwd?LY.fC:LY.rC;
+  const x0=x(f.s),x1=x(f.e),w=Math.max(2,x1-x0);
+  const hb=LY.gh*0.34, ht=LY.gh*0.5, hl=Math.min(9,w*0.55);
+  let d;
+  if(!fwd){const hs=x0+hl;
+    d=`M${x1} ${cy-hb} L${hs} ${cy-hb} L${hs} ${cy-ht} L${x0} ${cy} L${hs} ${cy+ht} L${hs} ${cy+hb} L${x1} ${cy+hb} Z`;}
+  else{const hs=x1-hl;
+    d=`M${x0} ${cy-hb} L${hs} ${cy-hb} L${hs} ${cy-ht} L${x1} ${cy} L${hs} ${cy+ht} L${hs} ${cy+hb} L${x0} ${cy+hb} Z`;}
+  const p=el("path",{d,fill:colorFor(f,P),stroke:"rgba(0,0,0,.22)","stroke-width":f.kind===K_INTI?1:.6},into);
+  return p;
+}
+function attcStar(cx,cy,r,col,into){
+  [[0,r],[r*0.87,r*0.5],[r*0.87,-r*0.5]].forEach(([dx,dy])=>
+    el("line",{x1:cx-dx,y1:cy-dy,x2:cx+dx,y2:cy+dy,stroke:col,"stroke-width":1.35,"stroke-linecap":"round"},into));
+}
+
+// the gene symbol shown above an arrow when Labels is on — a real name only,
+// so unnamed cassettes stay clean (most integron cassettes have no symbol).
+function geneLabel(f){
+  return f.gene ? (f.gene.length>16 ? f.gene.slice(0,15)+"…" : f.gene) : "";
+}
+// italicise real gene symbols (bacterial convention: lowercase-initial, e.g. intI,
+// dinB, yoaA); leave locus tags / abbreviations (VF_0530, ABM, BH0283) upright.
+const isGeneName = s => /^[a-z][A-Za-z]*[0-9]*$/.test(s||"");
+// clinker-style gene labels: forward above, reverse below, greedily skipping any
+// that would overlap one already placed (so a dense array only labels what fits).
+function drawLabels(x,a,b,P,into){
+  const fwdOcc=[], revOcc=[];
+  genes.filter(f=>f.e>=a&&f.s<=b).sort((p,q)=>(q.e-q.s)-(p.e-p.s)).forEach(f=>{
+    const txt=geneLabel(f); if(!txt) return;
+    const cx=x((f.s+f.e)/2), half=Math.max(txt.length*3.05,7), L=cx-half, R=cx+half;
+    const occ=f.dir>=0?fwdOcc:revOcc;
+    if(occ.some(o=>L<o.R+3 && R>o.L-3)) return;      // would collide with a placed label
+    occ.push({L,R});
+    const fwd=f.dir>=0, y=fwd?LY.fC-LY.gh-1:LY.rC+LY.gh+9;
+    const t=el("text",{x:cx,y,"text-anchor":"middle","font-size":9.5,"font-family":"IBM Plex Mono",
+      "font-style":isGeneName(txt)?"italic":"normal",fill:f.kind===K_INTI?P.inti:P.ink,"font-weight":"600"},into);
+    t.textContent=txt;
+  });
+}
+
+// draw the DNA bases near the top, only when zoomed in far enough to read them
+function drawSequence(x,a,b,sc,P,into,interactive){
+  if(!HAS_SEQ) return;
+  if(sc<7) return;                            // bases only appear once zoomed in
+  const from=Math.max(0,Math.floor(a)-SEQ0), to=Math.min(SEQ.length,Math.ceil(b)-SEQ0+1);
+  for(let i=from;i<to;i++){
+    const bp=SEQ0+i, ch=SEQ[i], inAttc=attc.some(f=>bp>=f.s&&bp<f.e);
+    if(inAttc) el("rect",{x:x(bp),y:LY.seqY-11,width:Math.max(1,sc),height:15,fill:P.attc,"fill-opacity":0.20},into);
+    const t=el("text",{x:x(bp+0.5),y:LY.seqY,"text-anchor":"middle","font-size":11.5,
+      "font-family":"IBM Plex Mono","font-weight":inAttc?"700":"400",
+      fill:inAttc?P.attc:(BASECOL[ch]||P.muted)},into);
+    t.textContent=ch;
+  }
+}
+
+// draw the whole scene into a target <svg>/<g>; `into` collects hover-bound nodes
+function drawScene(target,x,a,b,sc,innerW,P,interactive){
+  const bind2=interactive?bind:function(){};
+  // axis ticks + gridlines
+  const gTop=LY.attcY-10, gb=botY();
+  // user region highlights (behind everything), plus the live drag preview
+  (preview?regions.concat([preview]):regions).forEach(r=>{
+    const x0=Math.max(PAD.l,x(Math.max(r.a,a))), x1=Math.min(PAD.l+innerW,x(Math.min(r.b,b)));
+    if(x1>x0){
+      el("rect",{x:x0,y:gTop,width:x1-x0,height:gb-gTop,fill:r.color,
+        "fill-opacity":r===preview?0.28:0.17},target);
+      el("line",{x1:x0,x2:x0,y1:gTop,y2:gb,stroke:r.color,"stroke-width":1,"stroke-opacity":.6},target);
+      el("line",{x1:x1,x2:x1,y1:gTop,y2:gb,stroke:r.color,"stroke-width":1,"stroke-opacity":.6},target);
+    }
+  });
+  niceTicks(a,b,7).forEach(tk=>{
+    el("line",{x1:x(tk),x2:x(tk),y1:gTop,y2:gb,stroke:P.border,"stroke-width":1},target);
+    const tx=el("text",{x:x(tk),y:gb+15,fill:P.muted,"font-size":11,"text-anchor":"middle","font-family":"IBM Plex Mono"},target);
+    tx.textContent=(tk/1000).toFixed(1);
+  });
+  el("text",{x:PAD.l+innerW/2,y:gb+30,fill:P.faint,"font-size":11,"text-anchor":"middle","font-family":"IBM Plex Mono"},target)
+    .textContent="genomic position (kb)";
+  // backbone line
+  el("line",{x1:PAD.l,x2:PAD.l+innerW,y1:LY.bbY,y2:LY.bbY,stroke:P.bb,"stroke-width":1.4},target);
+  // genes: forward above, reverse below
+  genes.filter(f=>f.e>=a&&f.s<=b).forEach(f=>{const p=drawArrow(f,x,P,target);bind2(p,f);});
+  if(showLab) drawLabels(x,a,b,P,target);
+  // attC asterisks above the backbone
+  if(showAttc) attc.filter(f=>f.e>=a&&f.s<=b).forEach(f=>{
+    attcStar(x((f.s+f.e)/2),LY.attcY,4,P.attc,target);
+    const hit=el("rect",{x:x((f.s+f.e)/2)-5,y:LY.attcY-6,width:10,height:12,fill:"transparent"},target);
+    bind2(hit,f);
+  });
+  // length distribution track
+  if(showLen){
+    const ly=LY.lenY, lh=LY.lenH-16;
+    el("line",{x1:PAD.l,x2:PAD.l+innerW,y1:ly+lh,y2:ly+lh,stroke:P.border},target);
+    el("text",{x:8,y:ly+lh/2,fill:P.faint,"font-size":10.5,"font-family":"IBM Plex Mono","dominant-baseline":"middle"},target)
+      .textContent="length (bp)";
+    cds.filter(f=>f.e>=a&&f.s<=b).forEach(f=>{
+      const cx=x((f.s+f.e)/2), bw=Math.max(2,Math.min(9,(f.e-f.s)*sc)), bh=Math.max(1,(f.len/maxLen)*lh);
+      const r=el("rect",{x:cx-bw/2,y:ly+lh-bh,width:bw,height:bh,fill:colorFor(f,P),rx:1.2},target);
+      bind2(r,f);
+    });
+  }
+  // strand markers sit just left of the plot; the genome identifier goes in the left gutter,
+  // matching the compare view — so it is present in the exported figure too
+  el("text",{x:PAD.l-12,y:LY.fC,fill:P.faint,"font-size":9.5,"font-family":"IBM Plex Mono","dominant-baseline":"middle"},target).textContent="+";
+  el("text",{x:PAD.l-12,y:LY.rC,fill:P.faint,"font-size":9.5,"font-family":"IBM Plex Mono","dominant-baseline":"middle"},target).textContent="−";
+  el("text",{x:8,y:LY.fC-4,fill:P.ink,"font-size":14,"font-weight":700},target).textContent=GENOME_NAME;
+  el("text",{x:8,y:LY.fC+13,fill:P.faint,"font-size":11,"font-family":"IBM Plex Mono"},target).textContent=cds.length+" cassettes";
+  drawSequence(x,a,b,sc,P,target,interactive);
+}
+
+const nDef=cds.filter(f=>f.fncat==="defence").length, nTA=cds.filter(f=>f.fncat==="ta").length;
+document.getElementById("stats").innerHTML=[
+  ["attC sites",attc.length],["Cassettes",cds.length],
+  ["Defence",nDef],["Tox–antitox",nTA],["Span",(SPAN/1000).toFixed(1)+" <small>kb</small>"]
+].map(([k,v])=>`<div class="stat"><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
+
+function render(){
+  const P=palette();
+  const W=vp.clientWidth||900, H=contentH();
+  vp.style.height=H+"px";
+  const innerW=W-PAD.l-PAD.r;
+  const a=view.a,b=view.b, sc=innerW/(b-a);
+  const x=bp=>PAD.l+(bp-a)*sc;
+  vp.setAttribute("viewBox",`0 0 ${W} ${H}`); vp.innerHTML="";
+  drawScene(vp,x,a,b,sc,innerW,P,true);
+  drawOverview(P);
+}
+
+function drawOverview(P){
+  const W=ov.clientWidth||900,H=46,pl=8,pr=8,iw=W-pl-pr,y=H/2;
+  const x=bp=>pl+(bp-A0)/SPAN*iw;
+  ov.setAttribute("viewBox",`0 0 ${W} ${H}`);ov.innerHTML="";
+  el("line",{x1:pl,x2:pl+iw,y1:y,y2:y,stroke:P.bb,"stroke-width":1.4},ov);
+  feats.forEach(f=>{
+    if(f.kind===K_ATTC){if(showAttc)el("circle",{cx:x((f.s+f.e)/2),cy:y-8,r:1.2,fill:P.attc},ov);}
+    else{const w=Math.max(1,(f.e-f.s)/SPAN*iw), yy=f.dir<0?y+1:y-5;
+      el("rect",{x:x(f.s),y:yy,width:w,height:4,fill:f.kind===K_INTI?P.inti:colorFor(f,P),rx:1},ov);}
+  });
+  const wx0=x(view.a),wx1=x(view.b);
+  el("rect",{x:wx0,y:2,width:Math.max(6,wx1-wx0),height:H-4,fill:"var(--accent)",
+    "fill-opacity":.12,stroke:"var(--accent)","stroke-width":1.3,rx:3},ov);
+}
+
+const tip=document.getElementById("tip"), info=document.getElementById("info");
+function bind(node,f){
+  node.__feat=f;                                      // painted via the viewport hit-test
+  node.style.cursor="pointer";
+  node.addEventListener("mousemove",ev=>showTip(ev,f));
+  node.addEventListener("mouseenter",ev=>{showTip(ev,f);fillInfo(f);});
+  node.addEventListener("mouseleave",hideTip);
+}
+const chint=document.getElementById("chint"), cpick=document.getElementById("cpick");
+function paintArrow(f,ev){                            // click an arrow -> pick its colour
+  if(!f || f.kind===K_ATTC) return;                   // recolour genes, not attC marks
+  if(ev.altKey){ delete f.override; render(); return; } // alt-click clears this arrow
+  let v=f.override||colorFor(f,palette()); if(!/^#[0-9a-f]{6}$/i.test(v)) v="#888888";
+  cpick.style.left=(ev.clientX-6)+"px"; cpick.style.top=(ev.clientY-6)+"px";
+  cpick.style.pointerEvents="auto"; cpick.value=v;
+  cpick.oninput=()=>{ f.override=cpick.value; render(); };   // live preview as you drag the picker
+  cpick.onchange=()=>{ cpick.style.pointerEvents="none"; };
+  cpick.click();
+}
+function kindLabel(f){return f.kind===K_INTI?"Integrase":f.kind===K_ATTC?"attC site":"Cassette CDS";}
+function showTip(ev,f){
+  const hasFn=f.fncat && f.fnlabel && f.fnlabel!=="no annotation";
+  const fn=f.kind===K_CDS?`<div class="c">${fnLabel[f.fncat]}${hasFn?" · "+f.fnlabel:""}</div>`:"";
+  const ttl=f.gene?`${f.name} · ${isGeneName(f.gene)?"<i>"+f.gene+"</i>":f.gene}`:f.name;
+  tip.innerHTML=`<div class="t">${ttl}</div>`+
+    `<div class="c">${f.s.toLocaleString()}–${f.e.toLocaleString()} · ${f.len} bp · ${f.dir<0?"−":"+"} strand</div>`+fn;
+  tip.style.opacity=1;tip.style.transform="";
+  const px=Math.min(ev.clientX+14,innerWidth-tip.offsetWidth-8);
+  tip.style.left=px+"px";tip.style.top=(ev.clientY+14)+"px";
+}
+function hideTip(){tip.style.opacity=0;}
+function fillInfo(f){
+  let fnRow="";
+  if(f.kind===K_CDS){
+    const col=fnColor(f.fncat,palette());
+    const dom=(f.fnlabel&&f.fnlabel!=="no annotation")?` <span class="mono" style="margin-left:6px">${f.fnlabel}</span>`:"";
+    fnRow=`<dt>Function</dt><dd><span class="pill" style="background:${col}">${fnLabel[f.fncat]}</span>${dom}</dd>`;
+  }
+  const geneRow = f.gene ? `<dt>Gene</dt><dd class="mono" style="font-style:${isGeneName(f.gene)?'italic':'normal'}">${f.gene}</dd>` : "";
+  info.innerHTML=`<h3>Feature</h3><dl class="kv">
+    <dt>Type</dt><dd>${kindLabel(f)}</dd>
+    <dt>Name</dt><dd class="mono">${f.name}</dd>
+    ${geneRow}
+    <dt>Start</dt><dd class="mono">${f.s.toLocaleString()}</dd>
+    <dt>End</dt><dd class="mono">${f.e.toLocaleString()}</dd>
+    <dt>Length</dt><dd class="mono">${f.len.toLocaleString()} bp</dd>
+    <dt>Strand</dt><dd class="mono">${f.dir<0?"− (reverse)":"+ (forward)"}</dd>
+    ${fnRow}</dl>`;
+}
+
+function legendItems(){
+  const P=palette();let items;
+  if(mode==="strand")items=[["Forward strand",P.fwd],["Reverse strand",P.rev]];
+  else if(mode==="length")items=[["Short",P.faint],["Long (≥1.2 kb)",P.fwd]];
+  else items=[["Anti-phage defence",P.def],["Toxin–antitoxin",P.ta],["AMR",P.amr],["Pfam domain",P.other],["Hypothetical",P.hyp]];
+  items=items.concat([["intI integrase",P.inti]]);
+  if(showAttc) items.push(["attC ✳",P.attc]);
+  return items;
+}
+function drawLegend(){
+  document.getElementById("legend").innerHTML=
+    legendItems().map(([l,c])=>`<span class="lg"><span class="sw" style="background:${c}"></span>${l}</span>`).join("")+
+    `<span class="hint">scroll = zoom · drag = pan</span>`;
+}
+
+function niceTicks(a,b,n){
+  const raw=(b-a)/n, mag=Math.pow(10,Math.floor(Math.log10(raw)));
+  const step=[1,2,2.5,5,10].map(m=>m*mag).find(s=>s>=raw)||10*mag;
+  const t=[];for(let v=Math.ceil(a/step)*step;v<=b;v+=step)t.push(Math.round(v));return t;}
+
+function clampView(){
+  const min=60; if(view.b-view.a<min){const c=(view.a+view.b)/2;view.a=c-min/2;view.b=c+min/2;}
+  if(view.a<A0){view.b+=A0-view.a;view.a=A0;}
+  if(view.b>A1){view.a-=view.b-A1;view.b=A1;}
+  view.a=Math.max(A0,view.a);view.b=Math.min(A1,view.b);
+}
+function setView(a,b){view.a=a;view.b=b;clampView();render();}
+function zoomAt(bp,factor){const a=bp-(bp-view.a)*factor,b=bp+(view.b-bp)*factor;setView(a,b);}
+vp.addEventListener("wheel",ev=>{ev.preventDefault();
+  const W=vp.clientWidth,sc=(view.b-view.a)/(W-PAD.l-PAD.r);
+  const bp=view.a+(ev.offsetX-PAD.l)*sc;
+  zoomAt(bp,ev.deltaY>0?1.15:0.87);},{passive:false});
+function vpBp(ev){const r=vp.getBoundingClientRect(),W=vp.clientWidth,sc=(view.b-view.a)/(W-PAD.l-PAD.r);
+  return view.a+(ev.clientX-r.left-PAD.l)*sc;}
+let drag=null, rgn=null;
+vp.addEventListener("pointerdown",ev=>{
+  if(regionMode){ rgn={x:ev.clientX,bp:vpBp(ev)}; vp.setPointerCapture(ev.pointerId); return; }
+  drag={x:ev.clientX,a:view.a,b:view.b,moved:false};
+  vp.classList.add("drag");vp.setPointerCapture(ev.pointerId);});
+vp.addEventListener("pointermove",ev=>{
+  if(rgn){const bp=vpBp(ev);preview={a:Math.min(rgn.bp,bp),b:Math.max(rgn.bp,bp),color:brush};render();return;}
+  if(!drag)return;
+  if(Math.abs(ev.clientX-drag.x)>3) drag.moved=true;
+  const W=vp.clientWidth,sc=(drag.b-drag.a)/(W-PAD.l-PAD.r);
+  const dx=(ev.clientX-drag.x)*sc;setView(drag.a-dx,drag.b-dx);});
+function endRegion(ev){
+  if(!rgn)return;
+  const moved=Math.abs(ev.clientX-rgn.x);
+  if(moved<4){                                  // a click, not a drag: remove a band here
+    const bp=vpBp(ev);
+    for(let i=regions.length-1;i>=0;i--) if(bp>=regions[i].a&&bp<=regions[i].b){regions.splice(i,1);break;}
+  } else if(preview && preview.b-preview.a>0){
+    regions.push({a:preview.a,b:preview.b,color:brush});
+  }
+  rgn=null;preview=null;render();
+}
+vp.addEventListener("pointerup",ev=>{
+  if(rgn){endRegion(ev);return;}
+  if(!drag)return;
+  const wasClick=!drag.moved; drag=null; vp.classList.remove("drag");
+  if(wasClick){                                 // a click (not a pan) paints the arrow under it
+    const t=document.elementFromPoint(ev.clientX,ev.clientY);
+    if(t&&t.__feat) paintArrow(t.__feat,ev);
+  }});
+vp.addEventListener("pointercancel",()=>{drag=null;rgn=null;preview=null;vp.classList.remove("drag");render();});
+document.getElementById("zoomin").onclick=()=>zoomAt((view.a+view.b)/2,0.7);
+document.getElementById("zoomout").onclick=()=>zoomAt((view.a+view.b)/2,1.42);
+document.getElementById("fit").onclick=()=>setView(A0,A1);
+
+function ovBpFromEvent(ev){const r=ov.getBoundingClientRect();
+  const pl=8,iw=r.width-16;return A0+Math.max(0,Math.min(1,(ev.clientX-r.left-pl)/iw))*SPAN;}
+let ovDrag=false;
+ov.addEventListener("pointerdown",ev=>{ovDrag=true;const bp=ovBpFromEvent(ev);
+  const w=view.b-view.a;setView(bp-w/2,bp+w/2);ov.setPointerCapture(ev.pointerId);});
+ov.addEventListener("pointermove",ev=>{if(!ovDrag)return;const bp=ovBpFromEvent(ev);
+  const w=view.b-view.a;setView(bp-w/2,bp+w/2);});
+ov.addEventListener("pointerup",()=>ovDrag=false);
+
+document.querySelectorAll("#mode button").forEach(b=>b.onclick=()=>{
+  mode=b.dataset.mode;
+  document.querySelectorAll("#mode button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  drawLegend();render();});
+function tgl(id,get,set){const btn=document.getElementById(id);
+  btn.onclick=()=>{set(!get());btn.setAttribute("aria-pressed",get());drawLegend();render();};}
+tgl("t-lab",()=>showLab,v=>showLab=v);
+tgl("t-attc",()=>showAttc,v=>showAttc=v);
+tgl("t-len",()=>showLen,v=>showLen=v);
+
+// ---- colour tool: brush swatch, region-shade mode, reset ----
+const brushEl=document.getElementById("brush");
+brushEl.value=brush;
+brushEl.oninput=()=>{brush=brushEl.value;};
+document.getElementById("t-region").onclick=function(){
+  regionMode=!regionMode; this.setAttribute("aria-pressed",regionMode);
+  vp.classList.toggle("paint",regionMode);
+  chint.textContent=regionMode?"Drag to shade a region · click a band to remove it":"Click any arrow to pick its colour · alt-click to clear";
+  chint.style.opacity=1; clearTimeout(chint._t); chint._t=setTimeout(()=>chint.style.opacity=0,3200);
+};
+document.getElementById("reset-col").onclick=()=>{
+  regions=[]; preview=null; feats.forEach(f=>{delete f.override;}); render();
+};
+
+document.getElementById("theme").onclick=()=>{
+  const r=document.documentElement;
+  const cur=r.getAttribute("data-theme")||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");
+  r.setAttribute("data-theme",cur==="dark"?"light":"dark");
+  drawLegend();render();};
+
+// ---- export: a self-contained figure with title + legend, at a readable size ----
+function buildFigureSVG(){
+  const P=palette();
+  const W=Math.max(900,vp.clientWidth||900), innerW=W-PAD.l-PAD.r;
+  const a=view.a,b=view.b, sc=innerW/(b-a), x=bp=>PAD.l+(bp-a)*sc;
+  const titleH=14, ch=contentH();   // small top margin only — no baked-in title (genome name is in the filename)
+  // legend rows
+  const items=legendItems(), fs=13, swh=13, gapx=22, rowH=24;
+  let lx=PAD.l, ly=0, rows=1;
+  const lay=items.map(([l,c])=>{const wpx=swh+7+l.length*7.1+gapx;
+    if(lx+wpx>W-PAD.r && lx>PAD.l){lx=PAD.l;ly+=rowH;rows++;} const o={l,c,x:lx,y:ly}; lx+=wpx; return o;});
+  const legendTop=titleH+ch+6, totalH=legendTop+rows*rowH+8;
+  const NSU="http://www.w3.org/2000/svg";
+  const svg=document.createElementNS(NSU,"svg");
+  svg.setAttribute("xmlns",NSU); svg.setAttribute("width",W); svg.setAttribute("height",totalH);
+  svg.setAttribute("viewBox",`0 0 ${W} ${totalH}`);
+  const mk=(t,at,p)=>{const n=document.createElementNS(NSU,t);for(const k in at)n.setAttribute(k,at[k]);(p||svg).appendChild(n);return n;};
+  mk("rect",{x:0,y:0,width:W,height:totalH,fill:P.surface});
+  const g=mk("g",{transform:`translate(0,${titleH})`});
+  drawScene(g,x,a,b,sc,innerW,P,false);
+  lay.forEach(o=>{
+    mk("rect",{x:o.x,y:legendTop+o.y+rowH/2-swh/2,width:swh,height:swh,rx:2,fill:o.c,stroke:"rgba(0,0,0,.15)"});
+    mk("text",{x:o.x+swh+7,y:legendTop+o.y+rowH/2+4,"font-size":fs,fill:P.muted,
+      "font-family":"IBM Plex Sans,system-ui,sans-serif"}).textContent=o.l;
+  });
+  return '<?xml version="1.0" encoding="UTF-8"?>\n'+new XMLSerializer().serializeToString(svg);
+}
+function offer(filename,data){
+  try{
+    const blob=(data instanceof Blob)?data:
+      new Blob([data],{type:/\.svg$/.test(filename)?"image/svg+xml":"application/octet-stream"});
+    const url=URL.createObjectURL(blob), a=document.createElement("a");
+    a.href=url; a.download=filename; document.body.appendChild(a); a.click();
+    setTimeout(()=>{URL.revokeObjectURL(url); a.remove();},400);
+  }catch(e){toast("Export failed.");}
+}
+function toast(msg){const t=document.getElementById("tip");
+  t.innerHTML='<div class="t">'+msg+'</div>';t.style.opacity=1;
+  t.style.left="50%";t.style.top="16px";t.style.transform="translateX(-50%)";
+  clearTimeout(toast._t);toast._t=setTimeout(()=>{t.style.opacity=0;t.style.transform="";},2800);}
+document.getElementById("dl-svg").onclick=()=>offer(SLUG+"_integron.svg",buildFigureSVG());
+document.getElementById("dl-png").onclick=()=>{
+  const svg=buildFigureSVG(),img=new Image();
+  img.onload=()=>{const scale=2,W=img.width||900,H=img.height||400;
+    const c=document.createElement("canvas");c.width=W*scale;c.height=H*scale;
+    const ctx=c.getContext("2d");ctx.fillStyle=palette().surface;ctx.fillRect(0,0,c.width,c.height);
+    ctx.setTransform(scale,0,0,scale,0,0);ctx.drawImage(img,0,0);
+    c.toBlob(bb=>offer(SLUG+"_integron.png",bb));};
+  img.src="data:image/svg+xml;base64,"+btoa(unescape(encodeURIComponent(svg)));};
+document.getElementById("dl-pdf").onclick=()=>window.print();
+
+function boot(){drawLegend();setView(A0,A1);
+  chint.style.opacity=1; setTimeout(()=>chint.style.opacity=0,3800);}
+boot();
+addEventListener("resize",render);
+}
+</script>
