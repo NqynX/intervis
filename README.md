@@ -193,3 +193,23 @@ If you use intervis, please cite it along with IntegronFinder and DIAMOND:
 
 > Nguyen, L. (2026). intervis: an interactive integron array visualiser. SCIE3220.
 > https://github.com/NqynX/intervis
+
+## Running the bundled examples
+
+    git clone https://github.com/NqynX/intervis.git
+    cd intervis
+    micromamba create -f environment.yml
+    micromamba activate integronfinder
+    R -e 'shiny::runApp("app", host="127.0.0.1", port=8787, launch.browser=TRUE)'
+
+Open http://localhost:8787 and choose an example:
+
+- Demo integron A / B (synthetic)
+- Vibrio cholerae N16961 chromosome II (NC_002506.1)
+- Vibrio parahaemolyticus RIMD 2210633 (NC_004603.1)
+- Vibrio vulnificus YJ016 (BA000037)
+
+The three Vibrio examples include precomputed IntegronFinder output and open in
+the single-array view without re-running detection. Comparison uses DIAMOND and
+genome upload runs IntegronFinder. On an HPC, set host="0.0.0.0" and tunnel the
+port: ssh -N -L 8787:<node>:8787 user@host.

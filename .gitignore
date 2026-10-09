@@ -41,3 +41,8 @@ result.html
 Thumbs.db
 .idea/
 .vscode/
+
+# bundled Vibrio reference examples
+!app/examples/vcN16961.*
+!app/examples/vpRIMD.*
+!app/examples/vvYJ016.*

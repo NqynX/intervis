@@ -14,3 +14,6 @@ dependencies:
   - integron_finder >=2.0.2
   - diamond >=2.1
   - pip
+  - biopython
+  - r-base >=4.1
+  - r-shiny

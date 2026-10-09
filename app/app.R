@@ -17,13 +17,13 @@ library(shiny)
 # Shiny defaults to a 5 MB upload cap; genomes and GenBank files are bigger.
 options(shiny.maxRequestSize = 500 * 1024^2)   # 500 MB
 
-# runApp sets the wd to this app folder; the project root is two levels up.
+# runApp sets the wd to this app folder; the project root is one level up.
 # Override any of these with env vars if your layout differs.
 .app_dir     <- normalizePath(getwd())
 PROJECT      <- Sys.getenv("INTERVIS_PROJECT",
-                           unset = normalizePath(file.path(.app_dir, "..", ".."), mustWork = FALSE))
+                           unset = normalizePath(file.path(.app_dir, ".."), mustWork = FALSE))
 INTERVIS_PKG <- Sys.getenv("INTERVIS_PKG",
-                           unset = normalizePath(file.path(PROJECT, "intervis"), mustWork = FALSE))
+                           unset = PROJECT)
 SWISSPROT    <- Sys.getenv("INTERVIS_SWISSPROT",
                            unset = normalizePath(file.path(PROJECT, "db", "swissprot"), mustWork = FALSE))
 CPU          <- as.integer(Sys.getenv("INTERVIS_CPU", unset = "8"))
