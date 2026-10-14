@@ -3,130 +3,124 @@
 **Student:** Liam Nguyen (48596804)
 **Project:** Development of a bioinformatics pipeline for identifying and visualising integron cassette arrays in *Vibrio* genomes (intervis)
 **Supervisors:** Jan Engelstädter; Andrew Letten (Engelstädter Lab)
-**Code and data:** https://github.com/NqynX/intervis
+**Code and data:** development repository `vibrio-integron-pipeline`; released tool https://github.com/NqynX/intervis
 **Compute:** UQ Bunya HPC cluster (micromamba environments, SLURM)
 
-*This is a chronological record of a computational/bioinformatics project. Entries are grouped by work phase. Dates are to the week; where an exact date matters it is given. Each entry records what was done, the reasoning behind the decisions, the results, any problems and how they were resolved, and what came next. Commands, tool versions and accessions sufficient for replication are collected in the "Reproducibility" section at the end.*
+*A chronological record of a computational/bioinformatics project, grouped by work phase and dated to match the version-control history. Each entry records what was done, the reasoning behind the decisions, the results, any problems and how they were resolved, and what came next. Commands, tool versions and accessions sufficient for replication are collected in the "Reproducibility" section.*
 
 ---
 
-## Phase A — Background, scope and aims (early September 2026)
+## Phase 1 — Project setup and first reconstruction (7–10 August 2026)
 
-**Aim.** Define a project around integrons in the Vibrionaceae and settle a concrete, assessable deliverable.
+**Aim.** Set the project up and get from a genome to a drawn cassette array.
 
-**What I did.** Read the integron literature (Hall and Collis 1995; Mazel et al. 1998; Rowe-Magnus et al. 2001, 2003; Cury et al. 2016) and drafted the scientific introduction. Integrons capture and rearrange gene cassettes by site-specific recombination; in the Vibrionaceae they form chromosomal superintegrons that can exceed 100 kb and hold more than a hundred cassettes. The cassette boundaries are the attC recombination sites, which are conserved mainly through structure and vary widely in sequence, so detecting them is the technical bottleneck for reconstructing an array.
+**What I did.** Created the repository, recorded the IntegronFinder 2.0.2 environment, and wrote the first cassette-array reconstruction from IntegronFinder output, followed by metadata/length annotation and a first visualisation of the array. Recorded notes from the initial supervisor meeting (scope and direction).
 
-**Decisions and reasoning.** Set two aims: (1) test how the choice of detection tool and its settings changes the reconstructed array, and (2) build intervis, a reproducible pipeline that turns a detection result into an annotated, interactive, attC-resolved view with a built-in pairwise comparison. The first aim is needed to justify the detection step the second aim depends on — I did not want to build a visualiser on top of a detection step I had not evaluated.
+**Reasoning.** Pinned the detection environment in the first week so every later result is reproducible, and built the reconstruction step first because every downstream analysis and the visualiser depend on it.
 
-**Next.** Build the viewers and confirm the detection tooling.
-
----
-
-## Phase B — Prototype viewers and cassette-order distance (September 2026)
-
-**Aim.** Prove the interactive visualisation path on real *Vibrio* data and prototype a way to compare cassette order between arrays.
-
-**What I did.** Built two browser viewers in HTML/JS on real *Vibrio* superintegron data: a single-array view ("Cartographer") and a stacked comparison view ("Synteny") that links cassettes of the same protein family between genomes with ribbons. Added a distance-network prototype: each superintegron is reduced to an ordered list of cassette-family identifiers, and pairs are compared on the shared single-copy backbone using Cayley (transposition) distance and a move-to-front distance, with a random-permutation baseline and a Mash whole-genome distance carried alongside for contrast.
-
-**Decisions and reasoning.** Made the comparison ribbons a similarity gradient (per-pair amino-acid identity) instead of a flat "shared family" colour, because a flat colour hides how conserved each link actually is. Kept the ribbons neutral until the identity step is run rather than showing fabricated values. Chose Cayley/move-to-front distance because they measure rearrangement of the cassette order specifically, which Mash/ANI does not — ANI answers "how related are the genomes", the permutation distance answers "how rearranged is the array".
-
-**Consultation.** Reviewed the deliverable shape with J. Engelstädter. Outcome: an R/Shiny app *is* the webpage tool, so "keep it Shiny" and "a webpage where users upload a sequence" are the same thing. Agreed the input should be a genome sequence (intervis runs IntegronFinder itself), attC should belong to its cassette and be revealed on zoom, comparison is pairwise in the web tool, and annotation should come from public databases.
-
-**Next.** Fold IntegronFinder and annotation into a single engine behind the viewers.
+**Next.** Install and compare the detection tools properly.
 
 ---
 
-## Phase C — intervis engine and Shiny interface (late September – October 2026)
+## Phase 2 — Detection tools and tool comparison (27–28 August 2026)
 
-**Aim.** One engine, two front-ends: a Python engine shared by an R/Shiny web interface and a command-line tool.
+**Aim.** Install the detectors and compare them on a real superintegron.
 
-**What I did.** Built the engine: run IntegronFinder with `--local-max`, parse the `.integrons` output by column name, orient the array with the integrase on the left, reconstruct cassette intervals between consecutive attC sites, translate the cassette proteins and name them by DIAMOND blastp against Swiss-Prot, and emit the data the viewers draw from. Added the pairwise comparison: all cassette proteins searched against one another with DIAMOND, reciprocal best hits between arrays retained above identity and coverage thresholds, each link shaded by its own identity. Wrapped the engine in an R/Shiny interface that uploads one or two genomes and embeds the viewers. Iterated the GUI over many local snapshots.
+**What I did.** Installed and recorded HattCI; documented setting I-VIP aside (class-1 scope; no integrons on these genomes). Ran IntegronFinder and HattCI on the *V. cholerae* N16961 chromosome II superintegron, added a HattCI Viterbi-score threshold analysis, wrote a tool-comparison script and statistics, and extracted the cassette table and sequences (59 cassettes from N16961 chr II). Added a zoomed view for inspecting individual cassettes and their attC sites.
 
-**Decisions and reasoning.** Kept detection as an established method (IntegronFinder) rather than writing a new attC classifier — the contribution is the integron-native end-to-end path, not a new detector. Defined cassette intervals only between consecutive attC sites, so an array with *n* attC gives *n*−1 intervals; the promoter-proximal region between attI and the first attC is not counted as a cassette interval, which I noted so the interval count is not mistaken for a biological cassette total. Labelled proteins with no database hit as hypothetical rather than guessing, since a high hypothetical fraction is a real property of superintegron cassettes.
+**Reasoning.** Compared detectors on a common basis (a shared genome, with a swept HattCI score threshold) rather than at a single arbitrary cut-off, so the comparison would be fair. Recorded the I-VIP decision with its reason rather than silently dropping it.
 
-**Problems and fixes.** Running IntegronFinder from the tool needs a host with the `integronfinder` environment installed; resolved by running on Bunya in a micromamba environment. A public deployment would need a server with that environment and job handling — parked as future work, not a Phase-1 concern.
-
-**Next.** Evaluate the detection step on genomes with independent experimental evidence.
+**Next.** Annotate the cassettes and run the pipeline across more genomes.
 
 ---
 
-## Phase D — Reference genomes and validation framework (early–mid October 2026)
+## Phase 3 — Annotation and multi-genome pipeline (29 August 2026)
 
-**Aim.** Choose genomes whose integrons are experimentally described, so detection can be judged against something other than another tool.
+**Aim.** Give cassettes real names and automate the whole path.
 
-**What I did.** Selected five genomes: four Vibrionaceae superintegrons (*V. cholerae* 569B, *A. fischeri* DSM 507, *V. vulnificus* ATCC 27562, *V. parahaemolyticus* ATCC 17802) and one shorter *Xanthomonas campestris* ATCC 33913 integron with unusually short attC sites. Recorded accessions and the specific experimental evidence for each (Table 1).
+**What I did.** Added cassette annotation by BLASTx against Swiss-Prot plus CARD/RGI for resistance genes, wrapped detection, reconstruction and annotation into one automated pipeline script, and ran it on four further *Vibrio* genomes (*V. vulnificus* 0, *V. parahaemolyticus* 44, *V. cholerae* O395 50, *A. fischeri* 3 cassettes). Found and removed an earlier result set that had used the wrong genome.
 
-**Decisions and reasoning.** No complete, base-resolved experimental catalogue of attC sites exists for these assemblies, so true sensitivity cannot be measured directly. Chose the IntegronFinder `--local-max` call set as an *operational* reference because it gave the most complete reconstructions, and was explicit throughout that scores against it measure concordance, not absolute accuracy. Included *X. campestris* as a structurally contrasting, short-attC integron so the benchmark was not only long Vibrionaceae arrays.
+**Reasoning.** The low and highly variable cassette counts across these genomes were the first clear sign that detection settings strongly affect the result — the observation that later motivated the formal benchmark. Corrected the wrong-genome input as soon as it was spotted, to stop it propagating.
 
-**Gap identified.** The operational reference is itself a tool, so concordance is not accuracy — this gap is what later motivated the synthetic benchmark (Phase G).
-
----
-
-## Phase E — Detection benchmark (mid October 2026)
-
-**Aim.** Measure how detector choice and search depth change the reconstructed array across the five genomes.
-
-**What I did.** Ran IntegronFinder 2.0.2 twice per genome (default and `--local-max`), HattCI 1.0b on both strands (Viterbi ≥ 2), and I-VIP v1.2 and BacAnt 3.4.0 with their bundled databases. Recorded attC counts, the integrase-anchored span, and database matches (Table 2; Figure 2).
-
-**Results.** Local search increased attC counts in all four Vibrionaceae genomes (e.g. 45→118 in 569B, 22→126 in *A. fischeri*) but not in *X. campestris* (22 either way). The `--local-max` *V. vulnificus* array spanned 156.8 kb, close to the 158.3-kb superintegron resolved in the complete genome of the same strain. I-VIP returned no integrons; BacAnt returned only 0–4 class-1 database matches.
-
-**Problems and fixes.** BacAnt would not run out of the box: resolved a dependency chain (matplotlib, reportlab, colorlog, networkx; `dna_features_viewer` installed with `pip --no-deps`), downgraded Biopython to 1.76 for a removed `Bio.Alphabet` import, and patched a `SeqFeature.SimpleLocation` call in the BCBio GFF parser. After that BacAnt ran cleanly. HattCI runs as a local compiled binary (`./HattCI/hattci.out`), not an environment command — noted this so the runs are reproducible.
-
-**Reasoning.** Because each cassette is bounded by attC sites, a missed site merges two cassettes, so search depth changes the inferred architecture, not only the site count — this is why the search setting matters for the downstream comparison.
-
-**Next.** Quantify how closely the other tools agree with the operational reference.
+**Next.** Scale up and quantify.
 
 ---
 
-## Phase F — Concordance and threshold-independent accuracy (mid–late October 2026)
+## Phase 4 — Genus-wide survey and quantitative analyses (31 August 2026)
 
-**Aim.** Score agreement with the operational reference, and check the metric is appropriate.
+**Aim.** Put the single-genome observations on a population footing.
 
-**What I did.** Scored precision, recall and F1 with `score_f1.py` (a call matches a reference site when midpoints are within 100 bp, one-to-one on the same replicon) for the detectors with comparable attC coordinates (Table 3). Then questioned whether a single-threshold F1 is the right summary for HattCI, which produces a continuous score. Added average precision (AP) with `score_ap.py`: rank HattCI candidates by Viterbi score, sweep every cut-off, and take the mean precision at each recovered site — a threshold-independent summary (Figure A1).
+**What I did.** Ran the detection pipeline across a genus-wide survey of 988 complete Vibrionaceae genomes. Measured HattCI concordance with IntegronFinder (84%), ran DefenseFinder (3,741 anti-phage systems across 78% of genomes), and carried out a Cayley/permutation analysis of cassette order, which showed order is conserved above ~99% ANI and random below. Recorded all software and database versions and tidied the repository (ignore SLURM logs and regenerable intermediates).
 
-**Results and reasoning.** HattCI agreement was strongly genome-dependent (F1 0.67 in 569B to 0.01 in *A. fischeri*; AP 0.95 in *X. campestris* to 0.004 in *A. fischeri*). On *X. campestris* HattCI held precision 1.00 up to ~95% recall, so a stricter threshold would have been nearly exact there; on *A. fischeri* precision stayed below 0.05 at every threshold, so no cut-off recovered that array. This confirmed the model-level reading: IntegronFinder uses a covariance model that scores attC secondary structure, HattCI an HMM that scores the primary sequence, and HattCI fails on the divergent *A. fischeri* repeats because its model is sequence-based (consistent with the species-specific repeat divergence reported by Rowe-Magnus et al. 2003).
+**Reasoning.** The Cayley/permutation result distinguishes cassette-order rearrangement from overall genome relatedness, which whole-genome ANI alone cannot do — this is the quantitative basis for the later distance-network view. Recording versions here fixed the reproducibility baseline for the whole project.
 
-**Inquiry.** Recognised that F1 measures one operating point and can hide that a tool would be accurate at a different threshold; AP is the better-suited, threshold-independent metric, and the two are reported together. Confirmed HattCI's model type from its publication (hidden Markov model) rather than assuming.
-
-**Next.** Replace concordance with a genuine accuracy measurement.
+**Gap identified.** HattCI–IntegronFinder concordance varied between genomes, raising the question the final benchmark answered: is the disagreement a threshold effect or a model-level difference?
 
 ---
 
-## Phase G — Synthetic benchmark with known truth (late October 2026)
+## Phase 5 — Interactive visualiser and distance network (11–18 September 2026)
 
-**Aim.** Measure absolute recall/precision against a known attC catalogue, and test the structure-versus-sequence mechanism directly.
+**Aim.** Turn the static plots into an interactive, attC-resolved viewer with a comparison mode.
 
-**What I did.** Built synthetic genomes with `make_synthetic.py`: excised the native superintegron from the *V. cholerae* 569B chromosome (IntegronFinder `--local-max` span plus a 5-kb margin; the bare backbone returned no attC calls, confirming it was clean), and reinserted an 80-cassette array rebuilt from the genome's own integrase and real cassette units, recording every attC coordinate. Diverged the attC sequences from 0 to 30% in 5% steps two ways: random substitution (breaks the fold) and compensatory substitution on the two arms (changes sequence by the same amount while keeping the inverted repeat paired). Ran the four detectors (`run_synth_tools.sh`) and scored against the known coordinates (`score_synth.py`). One genome per condition, random seed 20260101.
+**What I did.** Built the v0.1 interactive visualiser (a `.integrons` parser and `plot_integron()`), rendered it on N16961, then a v0.2 multi-track view with gene arrows, attC sites and lengths, and per-cassette function categories. Added multi-genome comparison data, a Cayley/move-to-front distance-network view, and a v2 comparison in which ribbons are shaded by per-pair amino-acid identity. Bundled example `.integrons` and annotation tables as reproducible test cases.
 
-**Results.** On the empty backbone, IntegronFinder and BacAnt made no calls and HattCI eight. With the array present, IntegronFinder `--local-max` recall fell from 1.00 to 0.06 by 15% *random* divergence, but was 0.48 at 15% and 0.36 at 25% under *compensatory* divergence of the same magnitude; HattCI declined almost identically under both schemes (0.20 and 0.25 at 15%). So structure preservation rescues the covariance-model tool but not the sequence HMM — the controlled version of the *A. fischeri* result (Figure 3).
+**Consultation.** Reviewed the deliverable shape with J. Engelstädter. Outcome: an R/Shiny app *is* the webpage tool, so "keep it Shiny" and "a webpage where users upload a sequence" are the same deliverable; agreed the input is a genome (the tool runs IntegronFinder itself), attC belongs to its cassette and is revealed on zoom, comparison is pairwise, and annotation comes from public databases.
 
-**Inquiry and honest limits.** Designed this specifically to separate sequence change from structure loss, which the real genomes cannot do. Recorded the caveats plainly: the inserted attC are real 569B sites that IntegronFinder first called (a selection bias), so the comparison rests on the *slope* of recall against divergence and the gap between the two schemes, not the starting value; complementarity at the chosen positions is a construction, not an experimentally validated fold; and with one realisation per condition the trends are descriptive, not statistical. Replicated mutation runs with structural validation would test the mechanism more directly.
+**Reasoning.** Made the ribbons a similarity gradient instead of a flat shared-family colour so each link shows how conserved it is, and kept ribbons neutral until the identity step runs rather than showing fabricated values.
 
-**Next.** Write up the benchmark and the tool, and publish the code.
-
----
-
-## Phase H — Report writing and revision (2–13 October 2026)
-
-**Aim.** An IMRaD report within the word limit, accurate to the results, readable, and defensible.
-
-**What I did.** Drafted and revised the report through successive versions. Integrated the detection benchmark, the F1/AP concordance analysis and the synthetic benchmark; built the figures (detection counts, precision–recall/AP, synthetic recall) and the tables; kept the main text under the 2500-word limit by moving reproducibility detail to an appendix. Addressed supervisor author-queries (tool versions, database release, DIAMOND and classification settings) and a round of editorial-review comments (scoring definition, average-precision definition as a step summary rather than a trapezoidal area, single-realisation disclosure, BacAnt output reconciliation, figure-label neutrality, rounding of the *A. fischeri* AP).
-
-**Decisions and reasoning.** Kept the claims hedged to what the evidence supports: concordance is not accuracy; a count close to the published cassette number is completeness, not correctness (shown for *V. vulnificus* and 569B, with no reference line drawn where only partial cassette sets have been cloned); and detector differences are explained mechanistically but not over-claimed as the proven cause of the *A. fischeri* result. Verified the intervis annotation parameters against the source code rather than from memory before stating them, which corrected a draft that had merged the Swiss-Prot naming step with the comparison step.
-
-**Consultation.** Incorporated supervisor feedback across review cycles (J. Engelstädter, A. Letten).
+**Next.** Package the viewer and engine into a usable tool.
 
 ---
 
-## Phase I — Publishing, reproducibility and verification (October 2026)
+## Phase 6 — intervis packaged and released (28 September – 9 October 2026)
 
-**Aim.** Make the work reproducible by a reviewer from the repository alone.
+**Aim.** One engine behind an R/Shiny interface and a CLI, released so others can run it.
 
-**What I did.** Published intervis to GitHub (NqynX/intervis), with the engine, CLI, R/Shiny app, environment file and bundled reference *Vibrio* genomes so a supervisor can clone and run the stored examples. Confirmed the release at commit 6cb0bca (`git describe` v1.0.0-3-g6cb0bca). Recorded the exact tool versions, commands, database release and accessions for the appendix. Independently reproduced the case-study count: an IntegronFinder `--local-max` run on the *V. cholerae* N16961 assembly (GCF_000006745.1) returned 171 attC sites, giving the 170 reconstructed intervals reported.
+**What I did.** Built the engine (run IntegronFinder `--local-max`, reconstruct cassette intervals between consecutive attC sites, name cassette proteins by DIAMOND blastp against Swiss-Prot, emit the viewer data) with the R/Shiny interface and CLI on top. Split the tool into its own repository (`NqynX/intervis`) and made the v1.0.0 public release, then fixed it so a fresh clone runs out of the box — a supervisor clone had shown only the demo genomes and nothing on Run, because the reference genomes were git-ignored and the environment file was incomplete; corrected by committing the reference genomes, completing `environment.yml`, and fixing the backend path resolution.
 
-**Problems and fixes.** An early clone by the supervisor showed only the demo genomes and nothing on "Run", because the real reference genomes were git-ignored and the environment file was empty; fixed by committing the reference genomes and a complete environment file and re-pushing.
+**Reasoning.** Kept detection as an established method (IntegronFinder) rather than writing a new attC classifier; the contribution is the integron-native end-to-end path with attC-resolved, zoomable cassettes and built-in pairwise comparison.
 
-**Next / future work.** A curated attC reference spanning integron types for genuine sensitivity estimates; replicated synthetic mutation runs with structural validation; family-level (not one-to-one) cassette matching; and linking observed arrays to models of integron evolution.
+**Next.** Evaluate the detection step formally against genomes with independent experimental evidence.
+
+---
+
+## Phase 7 — Final benchmark on characterised genomes (early–mid October 2026)
+
+**Aim.** Replace the preliminary comparison with a benchmark on genomes whose integrons are experimentally described, and check the metric is appropriate.
+
+**What I did.** Selected five genomes with experimental evidence (*V. cholerae* 569B, *A. fischeri* DSM 507, *V. vulnificus* ATCC 27562, *V. parahaemolyticus* ATCC 17802, *X. campestris* ATCC 33913). Ran IntegronFinder (default and `--local-max`), HattCI, I-VIP and BacAnt; recorded attC counts, spans and database matches. Scored precision, recall and F1 against the IntegronFinder `--local-max` operational reference (midpoints within 100 bp). Then, questioning whether a single-threshold F1 suits a continuous-score detector, added average precision (AP) — a threshold-independent summary from the precision–recall curve.
+
+**Results and reasoning.** Local search recovered far more attC in the Vibrionaceae arrays than the default (e.g. 45→118 in 569B, 22→126 in *A. fischeri*) but not in *X. campestris*. HattCI agreement was strongly genome-dependent (F1 0.67 to 0.01; AP 0.95 to 0.004). On *A. fischeri*, precision stayed below 0.05 at every threshold, so no cut-off recovered that array — a model-level failure. This matches the model types: IntegronFinder scores attC secondary structure (covariance model), HattCI the primary sequence (HMM), and HattCI fails on the divergent *A. fischeri* repeats described by Rowe-Magnus et al. (2003).
+
+**Inquiry.** F1 measures one operating point and can hide that a tool would be accurate at a different threshold; AP is the better-suited metric, and both are reported.
+
+**Problems and fixes.** BacAnt needed a dependency chain resolved (Biopython 1.76 for a removed import, a BCBio GFF parser patch, several pip/conda installs) before it ran; HattCI runs as a local compiled binary, not an environment command — both recorded so the runs reproduce.
+
+**Next.** Measure genuine accuracy, not concordance.
+
+---
+
+## Phase 8 — Synthetic benchmark (mid October 2026)
+
+**Aim.** Measure absolute recall/precision against a known attC catalogue and test the structure-versus-sequence mechanism directly.
+
+**What I did.** Built synthetic genomes with a known truth: excised the native superintegron from *V. cholerae* 569B (the bare backbone returned no calls, confirming it was clean), reinserted an 80-cassette array rebuilt from the genome's own integrase and real cassette units, and diverged the attC from 0–30% in 5% steps two ways — random substitution (breaks the fold) and compensatory substitution (changes sequence by the same amount while keeping the inverted repeat paired). Ran the four detectors and scored against the known coordinates (one genome per condition, seed 20260101).
+
+**Results.** IntegronFinder `--local-max` recall fell from 1.00 to 0.06 by 15% random divergence, but was 0.48 at 15% and 0.36 at 25% under compensatory divergence; HattCI declined almost identically under both schemes. Structure preservation rescues the covariance-model tool but not the sequence HMM — the controlled version of the *A. fischeri* result.
+
+**Honest limits.** The inserted attC are real 569B sites IntegronFinder first called (a selection bias), so the comparison rests on the slope of recall against divergence and the gap between schemes, not the starting value; complementarity at the chosen positions is a construction, not a validated fold; with one realisation per condition the trends are descriptive, not statistical.
+
+---
+
+## Phase 9 — Report, reproducibility and records (October 2026)
+
+**Aim.** Write up the work within the word limit, make it reproducible, and keep the record.
+
+**What I did.** Drafted and revised the IMRaD report across successive versions, integrating the detection benchmark, the F1/AP concordance analysis and the synthetic benchmark; built the figures and tables; kept the main text under 2,500 words by moving reproducibility detail to an appendix. Addressed supervisor author-queries and a round of editorial-review comments (scoring and AP definitions, single-realisation disclosure, BacAnt output reconciliation, figure-label neutrality). Verified the intervis annotation parameters against the source code before stating them. Reproduced the case-study count (171 attC → 170 intervals for N16961). Published the analysis scripts, figures, benchmark workbook and this record to the repository.
+
+**Consultation.** Incorporated supervisor feedback (J. Engelstädter, A. Letten) across review cycles.
+
+**Future work.** A curated attC reference across integron types for genuine sensitivity estimates; replicated synthetic mutation runs with structural validation; family-level cassette matching; and linking observed arrays to models of integron evolution.
 
 ---
 
@@ -139,7 +133,7 @@
 - HattCI: `./HattCI/hattci.out -b <genome.fna> <out.txt>` (candidates at Viterbi ≥ 2)
 - I-VIP, BacAnt: bundled databases, default settings
 
-**intervis annotation.** DIAMOND 2.2.5 blastp of translated cassette proteins against UniProtKB/Swiss-Prot (575,748 sequences, downloaded 11 June 2026); naming step `diamond blastp --more-sensitive --max-target-seqs 1 --evalue 1e-5` (top hit per protein); pairwise comparison `diamond blastp --more-sensitive -k 50 --evalue 1e-5`, reciprocal best hits retained at ≥30% identity and ≥0.5 coverage (alignment length / shorter protein).
+**intervis annotation.** DIAMOND 2.2.5 blastp of translated cassette proteins against UniProtKB/Swiss-Prot (575,748 sequences, downloaded 11 June 2026); naming step `diamond blastp --more-sensitive --max-target-seqs 1 --evalue 1e-5` (top hit per protein); pairwise comparison `diamond blastp --more-sensitive -k 50 --evalue 1e-5`, reciprocal best hits at ≥30% identity and ≥0.5 coverage (alignment length / shorter protein).
 
 **Scoring.** A call matches a reference site when midpoints are within 100 bp on the same replicon; matching is one-to-one (greedy nearest, each reference used once). Precision = matched/all calls; recall = matched/all reference sites; F1 = harmonic mean. AP = mean precision recorded at each recovered site when calls are ranked by score (a step summary of the precision–recall curve, not the trapezoidal area).
 
@@ -147,15 +141,9 @@
 
 **Accessions.** Reference assemblies in Table 1 of the report; N16961 visualisation GCF_000006745.1 (chromosome II NC_002506.1).
 
-**Code.** https://github.com/NqynX/intervis (commit 6cb0bca, tag v1.0.0).
+## Version-control history
 
-**Version-control history (NqynX/intervis).**
-- `2d02ba9` (2026-09-28) — Initial public release: intervis v1.0.0 (engine, CLI, R/Shiny app).
-- `239b2f0` (2026-09-28) — docs: point citation and changelog links at the public repository.
-- `42e42ab` (2026-09-28) — docs: rewrite README in plain style.
-- `6cb0bca` (2026-10-09) — bundle three reference *Vibrio* examples so a fresh clone runs out of the box; add biopython and R/Shiny to the environment; fix backend path resolution. (`git describe` v1.0.0-3-g6cb0bca; used for the reproducibility appendix.)
-
----
+Two repositories hold the project. The **vibrio-integron-pipeline** development repo carries the day-to-day work: 40 commits from the initial commit on 7 Aug 2026 through the annotation tables on 18 Sep 2026 (project setup and reconstruction; HattCI install and tool comparison; annotation and the automated pipeline; the 988-genome genus survey, concordance and Cayley analysis; and the interactive visualiser and distance network). The tool was then split into the **NqynX/intervis** release repo: v1.0.0 on 28 Sep 2026, the out-of-the-box fix on 9 Oct 2026 (`6cb0bca`, `git describe` v1.0.0-3-g6cb0bca), and the analysis, figures and records added on 14 Oct 2026. Per-commit notes are recorded against each commit in both repositories.
 
 ## Supporting materials (graphics and data)
 
@@ -167,6 +155,6 @@
 - **Figure 3** — synthetic recall vs attC divergence (random vs compensatory).
 - **Figure A1** — HattCI precision–recall curves (average precision).
 - **Spreadsheet** — `SCIE3220_detection_benchmark.xlsx` (detection, F1, AP, synthetic sheets).
-- **Scripts** — `score_f1.py`, `score_ap.py`, `make_synthetic.py`, `run_synth_tools.sh`, `score_synth.py`; figure scripts; intervis engine/CLI/app in the repository.
+- **Scripts** — `score_ap.py`, `make_synthetic.py`, `run_synth_tools.sh`, `score_synth.py`; figure scripts; intervis engine/CLI/app in the repository.
 
-*Note for submission: dates above are to the week of work; please align them to your own calendar and add the exact dates of supervisor meetings before submitting.*
+*Note for submission: add the exact dates of supervisor meetings where marked, and confirm the phase dates against your own calendar.*
