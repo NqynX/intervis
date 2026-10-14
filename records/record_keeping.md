@@ -2,11 +2,9 @@
 
 **Student:** Liam Nguyen (48596804)
 **Project:** Development of a bioinformatics pipeline for identifying and visualising integron cassette arrays in *Vibrio* genomes (intervis)
-**Supervisors:** Jan Engelstädter; Andrew Letten (Engelstädter Lab)
+**Supervisor:** Jan Engelstädter (Engelstädter Lab)
 **Code and data:** development repository `vibrio-integron-pipeline`; released tool https://github.com/NqynX/intervis
 **Compute:** UQ Bunya HPC cluster (micromamba environments, SLURM)
-
-*A chronological record of a computational/bioinformatics project, grouped by work phase and dated to match the version-control history. Each entry records what was done, the reasoning behind the decisions, the results, any problems and how they were resolved, and what came next. Commands, tool versions and accessions sufficient for replication are collected in the "Reproducibility" section.*
 
 ---
 
@@ -118,7 +116,7 @@
 
 **What I did.** Drafted and revised the IMRaD report across successive versions, integrating the detection benchmark, the F1/AP concordance analysis and the synthetic benchmark; built the figures and tables; kept the main text under 2,500 words by moving reproducibility detail to an appendix. Addressed supervisor author-queries and a round of editorial-review comments (scoring and AP definitions, single-realisation disclosure, BacAnt output reconciliation, figure-label neutrality). Verified the intervis annotation parameters against the source code before stating them. Reproduced the case-study count (171 attC → 170 intervals for N16961). Published the analysis scripts, figures, benchmark workbook and this record to the repository.
 
-**Consultation.** Incorporated supervisor feedback (J. Engelstädter, A. Letten) across review cycles.
+**Consultation.** Incorporated feedback from my supervisor across review cycles.
 
 **Future work.** A curated attC reference across integron types for genuine sensitivity estimates; replicated synthetic mutation runs with structural validation; family-level cassette matching; and linking observed arrays to models of integron evolution.
 
@@ -156,5 +154,3 @@ Two repositories hold the project. The **vibrio-integron-pipeline** development 
 - **Figure A1** — HattCI precision–recall curves (average precision).
 - **Spreadsheet** — `SCIE3220_detection_benchmark.xlsx` (detection, F1, AP, synthetic sheets).
 - **Scripts** — `score_ap.py`, `make_synthetic.py`, `run_synth_tools.sh`, `score_synth.py`; figure scripts; intervis engine/CLI/app in the repository.
-
-*Note for submission: add the exact dates of supervisor meetings where marked, and confirm the phase dates against your own calendar.*
